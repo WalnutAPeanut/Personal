@@ -107,8 +107,8 @@ bool UCLMHeroComponent::CanChangeInitState(UGameFrameworkComponentManager* Manag
 	if (CurrentState == InitTags.InitState_DataAvailable && DesiredState == InitTags.InitState_DataInitialized)
 	{
 		// PawnExtensionComponent가 DataInitialized될 때까지 기다림 (== 모든 Feature Component가 DataAvailable인 상태)
-		//return CLMPS && Manager->HasFeatureReachedInitState(Pawn, UCLMPawnExtensionComponent::NAME_ActorFeatureName, InitTags.InitState_GameplayReady);
-		return CLMPS && Manager->HasFeatureReachedInitState(Pawn, UCLMPawnExtensionComponent::NAME_ActorFeatureName, InitTags.InitState_DataInitialized);
+		return CLMPS && Manager->HasFeatureReachedInitState(Pawn, UCLMPawnExtensionComponent::NAME_ActorFeatureName, InitTags.InitState_GameplayReady);
+		//return CLMPS && Manager->HasFeatureReachedInitState(Pawn, UCLMPawnExtensionComponent::NAME_ActorFeatureName, InitTags.InitState_DataInitialized);
 	}
 
 	// DataInitialized -> GameplayReady
