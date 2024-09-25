@@ -229,6 +229,8 @@ void UCLMHeroComponent::InitializePlayerInput(UInputComponent* PlayerInputCompon
 			}
 		}
 	}
+
+	UGameFrameworkComponentManager::SendGameFrameworkComponentExtensionEvent(const_cast<APawn*>(Pawn), NAME_BindInputsNow);
 }
 
 void UCLMHeroComponent::Input_Move(const FInputActionValue& InputActionValue)

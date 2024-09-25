@@ -28,6 +28,7 @@ public class CLMGame : ModuleRules
             // Game Features
             "ModularGameplay",
             "GameFeatures",
+            "ModularGameplayActors",
             // Input
             "InputCore",
             "EnhancedInput",

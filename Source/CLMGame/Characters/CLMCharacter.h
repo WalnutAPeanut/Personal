@@ -2,8 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "ModularCharacter.h"
 #include "CLMCharacter.generated.h"
 
 
@@ -11,7 +10,7 @@ class UCLMPawnExtensionComponent;
 class UCLMCameraComponent;
 
 UCLASS()
-class CLMGAME_API ACLMCharacter : public ACharacter
+class CLMGAME_API ACLMCharacter : public AModularCharacter
 {
 	GENERATED_BODY()
 

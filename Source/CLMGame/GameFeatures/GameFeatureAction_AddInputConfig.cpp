@@ -6,6 +6,7 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(GameFeatureAction_AddInputConfig)
 
+// PIE 상황에서 만약에 대한 상황에 대해 Reset
 void UGameFeatureAction_AddInputConfig::OnGameFeatureActivating(FGameFeatureActivatingContext& Context)
 {
 	FPerContextData& ActiveData = ContextData.FindOrAdd(Context);
