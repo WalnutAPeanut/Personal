@@ -51,7 +51,7 @@
 //		TArray<TSharedPtr<FComponentRequestHandle>> ComponentRequests;
 //		TArray<TWeakObjectPtr<UCommonActivatableWidget>> LayoutsAdded;
 //
-//		/** Lyra에서 HUDElement는 UIExtension으로 관리된다. */
+//		/** CLM에서 HUDElement는 UIExtension으로 관리된다. */
 //		TArray<FUIExtensionHandle> ExtensionHandles;
 //	};
 //

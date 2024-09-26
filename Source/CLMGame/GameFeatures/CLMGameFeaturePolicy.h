@@ -38,7 +38,7 @@
 // * 참고로, GameFeatureAction에도 Registering/Unregistering이 있긴하다:
 // * - 허나, 우리가 앞서 구현했다시피, 직접 Registering/Unregistering 호출해줘야 한다
 // *   - Registering/Unregistering 구현해봐야 호출하지 않으면 아무 의미 없다...
-// * - Lyra에서는 GameplayFeaturePolicy를 오버라이딩하는 방식으로 이를 진행하였다
+// * - CLM에서는 GameplayFeaturePolicy를 오버라이딩하는 방식으로 이를 진행하였다
 // */
 //UCLASS()
 //class UCLMGameFeature_AddGameplayCuePaths : public UObject, public IGameFeatureStateChangeObserver

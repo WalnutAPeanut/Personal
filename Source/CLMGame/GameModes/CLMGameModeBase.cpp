@@ -105,7 +105,7 @@ void ACLMGameModeBase::HandleMatchAssignmentIfNotExpectingOne()
 		ExperienceId = FPrimaryAssetId(FPrimaryAssetType(UCLMExperienceDefinition::StaticClass()->GetFName()), FName(*ExperienceFromOptions));
 	}
 
-	if (ExperienceId.IsValid() == false)
+	if (!ExperienceId.IsValid())
 	{
 		//우선 기본만 세팅을 하드코딩으로 한다.
 		ExperienceId = FPrimaryAssetId(FPrimaryAssetType("CLMExperienceDefinition"), FName("B_CLMDefaultExperience"));

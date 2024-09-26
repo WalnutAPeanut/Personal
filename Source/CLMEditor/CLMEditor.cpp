@@ -19,7 +19,7 @@ class FCLMEditorModule : public FDefaultGameModuleImpl
 
 		//if (!IsRunningGame())
 		//{
-		//	FModuleManager::Get().OnModulesChanged().AddRaw(this, &FLyraEditorModule::ModulesChangedCallback);
+		//	FModuleManager::Get().OnModulesChanged().AddRaw(this, &FCLMEditorModule::ModulesChangedCallback);
 
 		//	BindGameplayAbilitiesEditorDelegates();
 
@@ -35,15 +35,15 @@ class FCLMEditorModule : public FDefaultGameModuleImpl
 		//// Register the Context Effects Library asset type actions.
 		//{
 		//	IAssetTools& AssetTools = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools").Get();
-		//	TSharedRef<FAssetTypeActions_LyraContextEffectsLibrary> AssetAction = MakeShared<FAssetTypeActions_LyraContextEffectsLibrary>();
-		//	LyraContextEffectsLibraryAssetAction = AssetAction;
+		//	TSharedRef<FAssetTypeActions_CLMContextEffectsLibrary> AssetAction = MakeShared<FAssetTypeActions_CLMContextEffectsLibrary>();
+		//	CLMContextEffectsLibraryAssetAction = AssetAction;
 		//	AssetTools.RegisterAssetTypeActions(AssetAction);
 		//}
 	}
 
 	/*void OnBeginPIE(bool bIsSimulating)
 	{
-		ULyraExperienceManager* ExperienceManager = GEngine->GetEngineSubsystem<ULyraExperienceManager>();
+		UCLMExperienceManager* ExperienceManager = GEngine->GetEngineSubsystem<UCLMExperienceManager>();
 		check(ExperienceManager);
 		ExperienceManager->OnPlayInEditorBegun();
 	}
@@ -57,7 +57,7 @@ class FCLMEditorModule : public FDefaultGameModuleImpl
 		//// Unregister the Context Effects Library asset type actions.
 		//{
 		//	FAssetToolsModule* AssetToolsModule = FModuleManager::GetModulePtr<FAssetToolsModule>("AssetTools");
-		//	TSharedPtr<IAssetTypeActions> AssetAction = LyraContextEffectsLibraryAssetAction.Pin();
+		//	TSharedPtr<IAssetTypeActions> AssetAction = CLMContextEffectsLibraryAssetAction.Pin();
 		//	if (AssetToolsModule && AssetAction)
 		//	{
 		//		AssetToolsModule->Get().UnregisterAssetTypeActions(AssetAction.ToSharedRef());
@@ -109,7 +109,7 @@ protected:
 	}*/
 
 private:
-	/*TWeakPtr<IAssetTypeActions> LyraContextEffectsLibraryAssetAction;
+	/*TWeakPtr<IAssetTypeActions> CLMContextEffectsLibraryAssetAction;
 	FDelegateHandle ToolMenusHandle;*/
 };
 

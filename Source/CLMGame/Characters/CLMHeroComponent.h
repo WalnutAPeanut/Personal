@@ -23,7 +23,7 @@ public:
 	UCLMHeroComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	/** Overrides the camera from an active gameplay ability */
-	//void SetAbilityCameraMode(TSubclassOf<ULyraCameraMode> CameraMode, const FGameplayAbilitySpecHandle& OwningSpecHandle);
+	//void SetAbilityCameraMode(TSubclassOf<UCLMCameraMode> CameraMode, const FGameplayAbilitySpecHandle& OwningSpecHandle);
 
 	/** Clears the camera override if it is set */
 	//void ClearAbilityCameraMode(const FGameplayAbilitySpecHandle& OwningSpecHandle);

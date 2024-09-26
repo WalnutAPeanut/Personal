@@ -12,7 +12,7 @@ public class CLMServerTarget : TargetRules
 
 		ExtraModuleNames.AddRange(new string[] { "CLMGame" });
 
-		CLMGameTarget.ApplySharedLyraTargetSettings(this);
+		CLMGameTarget.ApplySharedCLMTargetSettings(this);
 
 		bUseChecksInShipping = true;
 	}

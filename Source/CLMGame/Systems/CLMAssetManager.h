@@ -47,7 +47,7 @@ public:
 
 	//// Global game data asset to use.
 	//UPROPERTY(Config)
-	//TSoftObjectPtr<UCLMGameData> LyraGameDataPath;
+	//TSoftObjectPtr<UCLMGameData> CLMGameDataPath;
 
 	//// Loaded version of the game data
 	//UPROPERTY(Transient)

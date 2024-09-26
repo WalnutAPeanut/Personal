@@ -25,7 +25,7 @@ UCLMAssetManager& UCLMAssetManager::Get()
 		return *Singleton;
 	}
 
-	UE_LOG(LogCLM, Fatal, TEXT("Invalid AssetManagerClassName in DefaultEngine.ini.  It must be set to LyraAssetManager!"));
+	UE_LOG(LogCLM, Fatal, TEXT("Invalid AssetManagerClassName in DefaultEngine.ini.  It must be set to CLMAssetManager!"));
 	// Fatal error above prevents this from being called.
 	return *NewObject<UCLMAssetManager>();
 }

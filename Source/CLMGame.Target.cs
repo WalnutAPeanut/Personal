@@ -16,12 +16,12 @@ public class CLMGameTarget : TargetRules
 
         ExtraModuleNames.AddRange(new string[] { "CLMGame" });
 
-        CLMGameTarget.ApplySharedLyraTargetSettings(this);
+        CLMGameTarget.ApplySharedCLMTargetSettings(this);
 	}
 
     private static bool bHasWarnedAboutShared = false;
 
-    internal static void ApplySharedLyraTargetSettings(TargetRules Target)
+    internal static void ApplySharedCLMTargetSettings(TargetRules Target)
     {
         ILogger Logger = Target.Logger;
 
@@ -84,7 +84,7 @@ public class CLMGameTarget : TargetRules
                 if (!bHasWarnedAboutShared)
                 {
                     bHasWarnedAboutShared = true;
-                    Logger.LogWarning("LyraGameEOS and dynamic target options are disabled when packaging from an installed version of the engine");
+                    Logger.LogWarning("CLMGameEOS and dynamic target options are disabled when packaging from an installed version of the engine");
                 }
             }
         }

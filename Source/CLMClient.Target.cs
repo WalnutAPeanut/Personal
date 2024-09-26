@@ -11,6 +11,6 @@ public class CLMClientTarget : TargetRules
 
 		ExtraModuleNames.AddRange(new string[] { "CLMGame" });
 
-		CLMGameTarget.ApplySharedLyraTargetSettings(this);
+		CLMGameTarget.ApplySharedCLMTargetSettings(this);
 	}
 }

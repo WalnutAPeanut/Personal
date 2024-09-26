@@ -16,7 +16,7 @@ public class CLMEditorTarget : TargetRules
             NativePointerMemberBehaviorOverride = PointerMemberBehavior.Disallow;
         }
 
-        CLMGameTarget.ApplySharedLyraTargetSettings(this);
+        CLMGameTarget.ApplySharedCLMTargetSettings(this);
 
         // This is used for touch screen development along with the "Unreal Remote 2" app
         EnablePlugins.Add("RemoteSession");
