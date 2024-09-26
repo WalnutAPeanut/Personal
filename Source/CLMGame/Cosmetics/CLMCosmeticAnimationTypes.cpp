@@ -1,11 +1,6 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "CLMCosmeticAnimationTypes.h"
-
-#include "Animation/AnimInstance.h"
-#include "Engine/SkeletalMesh.h"
-
-#include UE_INLINE_GENERATED_CPP_BY_NAME(CLMCosmeticAnimationTypes)
 
 TSubclassOf<UAnimInstance> FCLMAnimLayerSelectionSet::SelectBestLayer(const FGameplayTagContainer& CosmeticTags) const
 {
@@ -16,15 +11,15 @@ TSubclassOf<UAnimInstance> FCLMAnimLayerSelectionSet::SelectBestLayer(const FGam
 			return Rule.Layer;
 		}
 	}
-
 	return DefaultLayer;
 }
 
 USkeletalMesh* FCLMAnimBodyStyleSelectionSet::SelectBestBodyStyle(const FGameplayTagContainer& CosmeticTags) const
 {
+	// MeshRule을 순회하며, CosmeticTags 요구 조건에 맞는 MeshRule을 찾아 SkeletalMesh를 반환한다
 	for (const FCLMAnimBodyStyleSelectionEntry& Rule : MeshRules)
 	{
-		if ((Rule.Mesh != nullptr) && CosmeticTags.HasAll(Rule.RequiredTags))
+		if ((Rule.Mesh) && CosmeticTags.HasAll(Rule.RequiredTags))
 		{
 			return Rule.Mesh;
 		}
@@ -32,4 +27,3 @@ USkeletalMesh* FCLMAnimBodyStyleSelectionSet::SelectBestBodyStyle(const FGamepla
 
 	return DefaultMesh;
 }
-

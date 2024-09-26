@@ -1,95 +1,79 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Cosmetics/CLMPawnComponent_CharacterParts.h"
 
-#include "Components/SkeletalMeshComponent.h"
-#include "Cosmetics/CLMCharacterPartTypes.h"
-#include "GameFramework/Character.h"
+#include "CLMPawnComponent_CharacterParts.h"
 #include "GameplayTagAssetInterface.h"
-#include "Net/UnrealNetwork.h"
+#include "GameFramework/Character.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(CLMPawnComponent_CharacterParts)
-
-class FLifetimeProperty;
-class UPhysicsAsset;
-class USkeletalMesh;
-class UWorld;
-
-//////////////////////////////////////////////////////////////////////
-
-FString FCLMAppliedCharacterPartEntry::GetDebugString() const
+bool FCLMCharacterPartList::SpawnActorForEntry(FCLMAppliedCharacterPartEntry& Entry)
 {
-	return FString::Printf(TEXT("(PartClass: %s, Socket: %s, Instance: %s)"), *GetPathNameSafe(Part.PartClass), *Part.SocketName.ToString(), *GetPathNameSafe(SpawnedComponent));
+	bool bCreatedAnyActor = false;
+	// 전달된 AppliedCharacterPartEntry의 Part Class가 제대로 세팅되어 있다면
+	if (Entry.Part.PartClass != nullptr)
+	{
+		// OwnerComponent의 Owner에 속한 World를 반환
+		UWorld* World = OwnerComponent->GetWorld();
+
+		// CLMPawnComponent_CharacterParts에 어느 Component에 붙일 것인지 결정한다: 
+		// - GetSceneComponentToAttachTo
+		if (USceneComponent* ComponentToAttachTo = OwnerComponent->GetSceneComponentToAttachTo())
+		{
+			// 붙일 Component인 ComponentToAttachTo의 Bone 혹은 SocketName을 통해 어디에 붙일지 Transform을 계산한다
+			const FTransform SpawnTransform = ComponentToAttachTo->GetSocketTransform(Entry.Part.SocketName);
+
+			// 우리는 Actor-Actor의 결합이므로, ChildActorComponent를 활용한다
+			UChildActorComponent* PartComponent = NewObject<UChildActorComponent>(OwnerComponent->GetOwner());
+			PartComponent->SetupAttachment(ComponentToAttachTo, Entry.Part.SocketName);
+			PartComponent->SetChildActorClass(Entry.Part.PartClass);
+			// 참고로 RegisterComponent를 통해 마지막으로 RenderWorld인 FScene에 변경 내용을 전달한다 (혹은 생성한다)
+			PartComponent->RegisterComponent();
+
+			// ChildActorComponent에서 생성한 Actor를 반환하여
+			if (AActor* SpawnedActor = PartComponent->GetChildActor())
+			{
+				// 해당 Actor가 Parent인 CLMPawnComponent_CharacterParts의 Owner Actor보다 먼저 Tick이 실행되지 않도록 선행조건을 붙인다
+				if (USceneComponent* SpawnedRootComponent = SpawnedActor->GetRootComponent())
+				{
+					SpawnedRootComponent->AddTickPrerequisiteComponent(ComponentToAttachTo);
+				}
+			}
+
+			Entry.SpawnedComponent = PartComponent;
+			bCreatedAnyActor = true;
+		}
+	}
+
+	return bCreatedAnyActor;
 }
 
-//////////////////////////////////////////////////////////////////////
-
-void FCLMCharacterPartList::PreReplicatedRemove(const TArrayView<int32> RemovedIndices, int32 FinalSize)
+void FCLMCharacterPartList::DestroyActorForEntry(FCLMAppliedCharacterPartEntry& Entry)
 {
-	bool bDestroyedAnyActors = false;
-	for (int32 Index : RemovedIndices)
+	if (Entry.SpawnedComponent)
 	{
-		FCLMAppliedCharacterPartEntry& Entry = Entries[Index];
-		bDestroyedAnyActors |= DestroyActorForEntry(Entry);
-	}
-
-	if (bDestroyedAnyActors && ensure(OwnerComponent))
-	{
-		OwnerComponent->BroadcastChanged();
-	}
-}
-
-void FCLMCharacterPartList::PostReplicatedAdd(const TArrayView<int32> AddedIndices, int32 FinalSize)
-{
-	bool bCreatedAnyActors = false;
-	for (int32 Index : AddedIndices)
-	{
-		FCLMAppliedCharacterPartEntry& Entry = Entries[Index];
-		bCreatedAnyActors |= SpawnActorForEntry(Entry);
-	}
-
-	if (bCreatedAnyActors && ensure(OwnerComponent))
-	{
-		OwnerComponent->BroadcastChanged();
-	}
-}
-
-void FCLMCharacterPartList::PostReplicatedChange(const TArrayView<int32> ChangedIndices, int32 FinalSize)
-{
-	bool bChangedAnyActors = false;
-
-	// We don't support dealing with propagating changes, just destroy and recreate
-	for (int32 Index : ChangedIndices)
-	{
-		FCLMAppliedCharacterPartEntry& Entry = Entries[Index];
-
-		bChangedAnyActors |= DestroyActorForEntry(Entry);
-		bChangedAnyActors |= SpawnActorForEntry(Entry);
-	}
-
-	if (bChangedAnyActors && ensure(OwnerComponent))
-	{
-		OwnerComponent->BroadcastChanged();
+		Entry.SpawnedComponent->DestroyComponent();
+		Entry.SpawnedComponent = nullptr;
 	}
 }
 
 FCLMCharacterPartHandle FCLMCharacterPartList::AddEntry(FCLMCharacterPart NewPart)
 {
+	// PawnComponent의 CharacterPartList가 PartHandle를 관리하고, 이를 ControllerComponent_CharacterParts에 전달한다
 	FCLMCharacterPartHandle Result;
 	Result.PartHandle = PartHandleCounter++;
 
+	// Authority가 있다면, AppliedCharacterPartEntry를 Entries에 추가한다
 	if (ensure(OwnerComponent && OwnerComponent->GetOwner() && OwnerComponent->GetOwner()->HasAuthority()))
 	{
 		FCLMAppliedCharacterPartEntry& NewEntry = Entries.AddDefaulted_GetRef();
 		NewEntry.Part = NewPart;
 		NewEntry.PartHandle = Result.PartHandle;
-	
+
+		// 여기서 실제 Actor를 생성하고, OwnerComponent의 Owner Actor에 Actor끼리 RootComponent로 Attach 시킨다
 		if (SpawnActorForEntry(NewEntry))
 		{
+			// BroadcastChanged를 통해, OwnerComponent에서 Owner의 SkeletalMeshComponent를 활용하여, Animation 및 Physics를 Re-initialize해준다
 			OwnerComponent->BroadcastChanged();
 		}
-
-		MarkItemDirty(NewEntry);
 	}
 
 	return Result;
@@ -100,35 +84,12 @@ void FCLMCharacterPartList::RemoveEntry(FCLMCharacterPartHandle Handle)
 	for (auto EntryIt = Entries.CreateIterator(); EntryIt; ++EntryIt)
 	{
 		FCLMAppliedCharacterPartEntry& Entry = *EntryIt;
+
+		// 제거할 경우, PartHandle을 활용한다
 		if (Entry.PartHandle == Handle.PartHandle)
 		{
-			const bool bDestroyedActor = DestroyActorForEntry(Entry);
-			EntryIt.RemoveCurrent();
-			MarkArrayDirty();
-
-			if (bDestroyedActor && ensure(OwnerComponent))
-			{
-				OwnerComponent->BroadcastChanged();
-			}
-
-			break;
+			DestroyActorForEntry(Entry);
 		}
-	}
-}
-
-void FCLMCharacterPartList::ClearAllEntries(bool bBroadcastChangeDelegate)
-{
-	bool bDestroyedAnyActors = false;
-	for (FCLMAppliedCharacterPartEntry& Entry : Entries)
-	{
-		bDestroyedAnyActors |= DestroyActorForEntry(Entry);
-	}
-	Entries.Reset();
-	MarkArrayDirty();
-
-	if (bDestroyedAnyActors && bBroadcastChangeDelegate && ensure(OwnerComponent))
-	{
-		OwnerComponent->BroadcastChanged();
 	}
 }
 
@@ -136,13 +97,19 @@ FGameplayTagContainer FCLMCharacterPartList::CollectCombinedTags() const
 {
 	FGameplayTagContainer Result;
 
+	// Entries를 순회하며,
 	for (const FCLMAppliedCharacterPartEntry& Entry : Entries)
 	{
-		if (Entry.SpawnedComponent != nullptr)
+		// Part Actor가 생성되어 SpawnedComponent에 캐싱되어 있으면
+		if (Entry.SpawnedComponent)
 		{
+			// 해당 Actor의 IGameplayTagAssetInterface를 통해 GameplayTag를 검색한다:
+			// - 현재 우리의 TaggedActor는 IGameplayTagAssetInterface를 상속받지 않으므로 그냥 넘어갈 것이다
+			// - 후일 여러분들이 각 Part에 대해 GameplayTag를 넣고 싶다면 이걸 상속받아 정의해야 한다:
+			//   - 예로 들어, 특정 Lv100이상 장착 가능한 장비를 만들고 싶다면 넣어야겠다
 			if (IGameplayTagAssetInterface* TagInterface = Cast<IGameplayTagAssetInterface>(Entry.SpawnedComponent->GetChildActor()))
 			{
-				TagInterface->GetOwnedGameplayTags(/*inout*/ Result);
+				TagInterface->GetOwnedGameplayTags(Result);
 			}
 		}
 	}
@@ -150,82 +117,81 @@ FGameplayTagContainer FCLMCharacterPartList::CollectCombinedTags() const
 	return Result;
 }
 
-bool FCLMCharacterPartList::SpawnActorForEntry(FCLMAppliedCharacterPartEntry& Entry)
+UCLMPawnComponent_CharacterParts::UCLMPawnComponent_CharacterParts(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+, CharacterPartList(this)
 {
-	bool bCreatedAnyActors = false;
+}
 
-	if (ensure(OwnerComponent) && !OwnerComponent->IsNetMode(NM_DedicatedServer))
+USkeletalMeshComponent* UCLMPawnComponent_CharacterParts::GetParentMeshComponent() const
+{
+	// Character를 활용하여, 최상위 SkeletalMesh를 반환한다
+	if (AActor* OwnerActor = GetOwner())
 	{
-		if (Entry.Part.PartClass != nullptr)
+		if (ACharacter* OwningCharacter = Cast<ACharacter>(OwnerActor))
 		{
-			UWorld* World = OwnerComponent->GetWorld();
-
-			if (USceneComponent* ComponentToAttachTo = OwnerComponent->GetSceneComponentToAttachTo())
+			if (USkeletalMeshComponent* MeshComponent = OwningCharacter->GetMesh())
 			{
-				const FTransform SpawnTransform = ComponentToAttachTo->GetSocketTransform(Entry.Part.SocketName);
-
-				UChildActorComponent* PartComponent = NewObject<UChildActorComponent>(OwnerComponent->GetOwner());
-
-				PartComponent->SetupAttachment(ComponentToAttachTo, Entry.Part.SocketName);
-				PartComponent->SetChildActorClass(Entry.Part.PartClass);
-				PartComponent->RegisterComponent();
-
-				if (AActor* SpawnedActor = PartComponent->GetChildActor())
-				{
-					switch (Entry.Part.CollisionMode)
-					{
-					case ECharacterCustomizationCollisionMode::UseCollisionFromCharacterPart:
-						// Do nothing
-						break;
-
-					case ECharacterCustomizationCollisionMode::NoCollision:
-						SpawnedActor->SetActorEnableCollision(false);
-						break;
-					}
-
-					// Set up a direct tick dependency to work around the child actor component not providing one
-					if (USceneComponent* SpawnedRootComponent = SpawnedActor->GetRootComponent())
-					{
-						SpawnedRootComponent->AddTickPrerequisiteComponent(ComponentToAttachTo);
-					}
-				}
-
-				Entry.SpawnedComponent = PartComponent;
-				bCreatedAnyActors = true;
+				return MeshComponent;
 			}
 		}
 	}
-
-	return bCreatedAnyActors;
+	return nullptr;
 }
 
-bool FCLMCharacterPartList::DestroyActorForEntry(FCLMAppliedCharacterPartEntry& Entry)
+USceneComponent* UCLMPawnComponent_CharacterParts::GetSceneComponentToAttachTo() const
 {
-	bool bDestroyedAnyActors = false;
-
-	if (Entry.SpawnedComponent != nullptr)
+	// Parent에 SkeletalMeshComponent가 있으면 반환하고
+	if (USkeletalMeshComponent* MeshComponent = GetParentMeshComponent())
 	{
-		Entry.SpawnedComponent->DestroyComponent();
-		Entry.SpawnedComponent = nullptr;
-		bDestroyedAnyActors = true;
+		return MeshComponent;
 	}
 
-	return bDestroyedAnyActors;
+	// 그리고 RootComponent도 확인하고
+	if (AActor* OwnerActor = GetOwner())
+	{
+		return OwnerActor->GetRootComponent();
+	}
+
+	// 그냥 nullptr 반환
+	return nullptr;
 }
 
-//////////////////////////////////////////////////////////////////////
-
-UCLMPawnComponent_CharacterParts::UCLMPawnComponent_CharacterParts(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
+FGameplayTagContainer UCLMPawnComponent_CharacterParts::GetCombinedTags(FGameplayTag RequiredPrefix) const
 {
-	SetIsReplicatedByDefault(true);
+	// 현재 장착된 CharacterPartList의 Merge된 Tags를 반환한다
+	FGameplayTagContainer Result = CharacterPartList.CollectCombinedTags();
+	if (RequiredPrefix.IsValid())
+	{
+		// 만약 GameplayTag를 통해 필터링할 경우, 필터링해서 진행한다
+		return Result.Filter(FGameplayTagContainer(RequiredPrefix));
+	}
+	else
+	{
+		// 필터링할 GameplayTag가 없으면 그냥 반환
+		return Result;
+	}
 }
 
-void UCLMPawnComponent_CharacterParts::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
+void UCLMPawnComponent_CharacterParts::BroadcastChanged()
 {
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	const bool bReinitPose = true;
 
-	DOREPLIFETIME(ThisClass, CharacterPartList);
+	// 현재 Owner의 SkeletalMeshComponent를 반환한다
+	if (USkeletalMeshComponent* MeshComponent = GetParentMeshComponent())
+	{
+		// BodyMeshes를 통해, GameplayTag를 활용하여, 알맞은 SkeletalMesh로 재설정해준다
+		const FGameplayTagContainer MergedTags = GetCombinedTags(FGameplayTag());
+		USkeletalMesh* DesiredMesh = BodyMeshes.SelectBestBodyStyle(MergedTags);
+
+		// SkeletalMesh를 초기화 및 Animation 초기화 시켜준다
+		MeshComponent->SetSkeletalMesh(DesiredMesh, bReinitPose);
+
+		// PhysicsAsset을 초기화해준다
+		if (UPhysicsAsset* PhysicsAsset = BodyMeshes.ForcedPhysicsAsset)
+		{
+			MeshComponent->SetPhysicsAsset(PhysicsAsset, bReinitPose);
+		}
+	}
 }
 
 FCLMCharacterPartHandle UCLMPawnComponent_CharacterParts::AddCharacterPart(const FCLMCharacterPart& NewPart)
@@ -237,121 +203,3 @@ void UCLMPawnComponent_CharacterParts::RemoveCharacterPart(FCLMCharacterPartHand
 {
 	CharacterPartList.RemoveEntry(Handle);
 }
-
-void UCLMPawnComponent_CharacterParts::RemoveAllCharacterParts()
-{
-	CharacterPartList.ClearAllEntries(/*bBroadcastChangeDelegate=*/ true);
-}
-
-void UCLMPawnComponent_CharacterParts::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
-void UCLMPawnComponent_CharacterParts::EndPlay(const EEndPlayReason::Type EndPlayReason)
-{
-	CharacterPartList.ClearAllEntries(/*bBroadcastChangeDelegate=*/ false);
-
-	Super::EndPlay(EndPlayReason);
-}
-
-void UCLMPawnComponent_CharacterParts::OnRegister()
-{
-	Super::OnRegister();
-	
-	if (!IsTemplate())
-	{
-		CharacterPartList.SetOwnerComponent(this);
-	}
-}
-
-TArray<AActor*> UCLMPawnComponent_CharacterParts::GetCharacterPartActors() const
-{
-	TArray<AActor*> Result;
-	Result.Reserve(CharacterPartList.Entries.Num());
-
-	for (const FCLMAppliedCharacterPartEntry& Entry : CharacterPartList.Entries)
-	{
-		if (UChildActorComponent* PartComponent = Entry.SpawnedComponent)
-		{
-			if (AActor* SpawnedActor = PartComponent->GetChildActor())
-			{
-				Result.Add(SpawnedActor);
-			}
-		}
-	}
-
-	return Result;
-}
-
-USkeletalMeshComponent* UCLMPawnComponent_CharacterParts::GetParentMeshComponent() const
-{
-	if (AActor* OwnerActor = GetOwner())
-	{
-		if (ACharacter* OwningCharacter = Cast<ACharacter>(OwnerActor))
-		{
-			if (USkeletalMeshComponent* MeshComponent = OwningCharacter->GetMesh())
-			{
-				return MeshComponent;
-			}
-		}
-	}
-
-	return nullptr;
-}
-
-USceneComponent* UCLMPawnComponent_CharacterParts::GetSceneComponentToAttachTo() const
-{
-	if (USkeletalMeshComponent* MeshComponent = GetParentMeshComponent())
-	{
-		return MeshComponent;
-	}
-	else if (AActor* OwnerActor = GetOwner())
-	{
-		return OwnerActor->GetRootComponent();
-	}
-	else
-	{
-		return nullptr;
-	}
-}
-
-FGameplayTagContainer UCLMPawnComponent_CharacterParts::GetCombinedTags(FGameplayTag RequiredPrefix) const
-{
-	FGameplayTagContainer Result = CharacterPartList.CollectCombinedTags();
-	if (RequiredPrefix.IsValid())
-	{
-		return Result.Filter(FGameplayTagContainer(RequiredPrefix));
-	}
-	else
-	{
-		return Result;
-	}
-}
-
-void UCLMPawnComponent_CharacterParts::BroadcastChanged()
-{
-	const bool bReinitPose = true;
-
-	// Check to see if the body type has changed
-	if (USkeletalMeshComponent* MeshComponent = GetParentMeshComponent())
-	{
-		// Determine the mesh to use based on cosmetic part tags
-		const FGameplayTagContainer MergedTags = GetCombinedTags(FGameplayTag());
-		USkeletalMesh* DesiredMesh = BodyMeshes.SelectBestBodyStyle(MergedTags);
-
-		// Apply the desired mesh (this call is a no-op if the mesh hasn't changed)
-		MeshComponent->SetSkeletalMesh(DesiredMesh, /*bReinitPose=*/ bReinitPose);
-
-		// Apply the desired physics asset if there's a forced override independent of the one from the mesh
-		if (UPhysicsAsset* PhysicsAsset = BodyMeshes.ForcedPhysicsAsset)
-		{
-			MeshComponent->SetPhysicsAsset(PhysicsAsset, /*bForceReInit=*/ bReinitPose);
-		}
-	}
-
-	// Let observers know, e.g., if they need to apply team coloring or similar
-	//OnCharacterPartsChanged.Broadcast(this);
-}
-
-

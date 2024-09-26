@@ -1,29 +1,20 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
+#include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
-#include "Templates/SubclassOf.h"
-
 #include "CLMCosmeticAnimationTypes.generated.h"
-
-class UAnimInstance;
-class UPhysicsAsset;
-class USkeletalMesh;
-
-//////////////////////////////////////////////////////////////////////
 
 USTRUCT(BlueprintType)
 struct FCLMAnimLayerSelectionEntry
 {
 	GENERATED_BODY()
 
-	// Layer to apply if the tag matches
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<UAnimInstance> Layer;
 
-	// Cosmetic tags required (all of these must be present to be considered a match)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(Categories="Cosmetic"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FGameplayTagContainer RequiredTags;
 };
 
@@ -31,32 +22,30 @@ USTRUCT(BlueprintType)
 struct FCLMAnimLayerSelectionSet
 {
 	GENERATED_BODY()
-		
-	// List of layer rules to apply, first one that matches will be used
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(TitleProperty=Layer))
+
+	/** CosmeticTags 기반하여, 적절한 AnimLayer를 반환한다 */
+	TSubclassOf<UAnimInstance> SelectBestLayer(const FGameplayTagContainer& CosmeticTags) const;
+
+	/** 앞서 보았던 CLMAnimBodyStyleSelection의 MeshRule과 같이 AnimInstance의 Rule을 가진 LayerRules로 생각하면 됨 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FCLMAnimLayerSelectionEntry> LayerRules;
 
-	// The layer to use if none of the LayerRules matches
+	/** 디폴트 Layer */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<UAnimInstance> DefaultLayer;
-
-	// Choose the best layer given the rules
-	TSubclassOf<UAnimInstance> SelectBestLayer(const FGameplayTagContainer& CosmeticTags) const;
 };
-
-//////////////////////////////////////////////////////////////////////
 
 USTRUCT(BlueprintType)
 struct FCLMAnimBodyStyleSelectionEntry
 {
 	GENERATED_BODY()
 
-	// Layer to apply if the tag matches
+	/** AnimLayer를 적용할 대상 SkeletalMesh */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<USkeletalMesh> Mesh = nullptr;
 
-	// Cosmetic tags required (all of these must be present to be considered a match)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(Categories="Cosmetic"))
+	/** Cosmetic Tag라고 생각하면 됨 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (Categories = "Cosmetic"))
 	FGameplayTagContainer RequiredTags;
 };
 
@@ -64,19 +53,19 @@ USTRUCT(BlueprintType)
 struct FCLMAnimBodyStyleSelectionSet
 {
 	GENERATED_BODY()
-		
-	// List of layer rules to apply, first one that matches will be used
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(TitleProperty=Mesh))
+
+	/** GameplayTag를 통해 (CosmeticTags), Mesh Rules에 따라 알맞은 BodyStyle를 번환한다 */
+	USkeletalMesh* SelectBestBodyStyle(const FGameplayTagContainer& CosmeticTags) const;
+
+	/** AnimLayer 적용할 SkeletalMesh를 들고 있음 -> Animation-Mesh간 Rules을 MeshRules라고 생각하면 됨 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FCLMAnimBodyStyleSelectionEntry> MeshRules;
 
-	// The layer to use if none of the LayerRules matches
+	/** 그냥 디폴트로 적용할 SkeletalMesh */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<USkeletalMesh> DefaultMesh = nullptr;
 
-	// If set, ensures this physics asset is always used
+	/** Physics Asset은 하나로 동일함 -> 즉 모든 Animation의 Physics 속성은 공유함 */
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UPhysicsAsset> ForcedPhysicsAsset = nullptr;
-
-	// Choose the best body style skeletal mesh given the rules
-	USkeletalMesh* SelectBestBodyStyle(const FGameplayTagContainer& CosmeticTags) const;
 };
