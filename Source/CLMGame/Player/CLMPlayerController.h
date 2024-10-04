@@ -16,4 +16,6 @@ class CLMGAME_API ACLMPlayerController : public AModularPlayerController
 public:
 	ACLMPlayerController(const FObjectInitializer& ObjectInitializer);
 
+
+	virtual void OnPossess(APawn* aPawn) override;
 };

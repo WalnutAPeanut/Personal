@@ -31,6 +31,17 @@ bool FCLMCharacterPartList::SpawnActorForEntry(FCLMAppliedCharacterPartEntry& En
 			// ChildActorComponent에서 생성한 Actor를 반환하여
 			if (AActor* SpawnedActor = PartComponent->GetChildActor())
 			{
+				//switch (Entry.Part.CollisionMode)
+				//{
+				//case ECharacterCustomizationCollisionMode::UseCollisionFromCharacterPart:
+				//	// Do nothing
+				//	break;
+
+				//case ECharacterCustomizationCollisionMode::NoCollision:
+				//	SpawnedActor->SetActorEnableCollision(false);
+				//	break;
+				//}
+
 				// 해당 Actor가 Parent인 CLMPawnComponent_CharacterParts의 Owner Actor보다 먼저 Tick이 실행되지 않도록 선행조건을 붙인다
 				if (USceneComponent* SpawnedRootComponent = SpawnedActor->GetRootComponent())
 				{

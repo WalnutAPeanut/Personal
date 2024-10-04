@@ -37,7 +37,6 @@ class CLMGAME_API UCLMEquipmentDefinition : public UObject
 public:
 	UCLMEquipmentDefinition(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-private:
 	// * 해당 메타 데이터를 사용하면, 어떤 인스턴스를 Spawn할지 결정하는 클래스 
 	UPROPERTY(EditDefaultsOnly, Category = Equipment)
 	TSubclassOf<UCLMEquipmentInstance> InstanceType;

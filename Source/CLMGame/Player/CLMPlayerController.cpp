@@ -8,3 +8,9 @@ ACLMPlayerController::ACLMPlayerController(const FObjectInitializer& ObjectIniti
 {
 	PlayerCameraManagerClass = ACLMPlayerCameraManager::StaticClass();
 }
+
+void ACLMPlayerController::OnPossess(APawn* aPawn)
+{
+	Super::OnPossess(aPawn);
+	int a = 10;
+}

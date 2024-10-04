@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
+#include "Components/ActorComponent.h"
 #include "CLMEquipmentInstance.generated.h"
 
 struct FCLMEquipmentActorToSpawn;
