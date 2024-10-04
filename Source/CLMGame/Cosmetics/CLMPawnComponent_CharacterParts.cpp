@@ -128,8 +128,8 @@ FGameplayTagContainer FCLMCharacterPartList::CollectCombinedTags() const
 	return Result;
 }
 
-UCLMPawnComponent_CharacterParts::UCLMPawnComponent_CharacterParts(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
-, CharacterPartList(this)
+UCLMPawnComponent_CharacterParts::UCLMPawnComponent_CharacterParts(const FObjectInitializer& ObjectInitializer) 
+	: Super(ObjectInitializer), CharacterPartList(this)
 {
 }
 
