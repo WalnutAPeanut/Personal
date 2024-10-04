@@ -51,7 +51,6 @@ private:
 
 //////////////////////////////////////////////////////////////////////
 // A character part request
-
 USTRUCT(BlueprintType)
 struct FCLMCharacterPart
 {
