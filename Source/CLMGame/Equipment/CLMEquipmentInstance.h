@@ -11,7 +11,7 @@ struct FCLMEquipmentActorToSpawn;
 /**
  * 
  */
-UCLASS()
+UCLASS(BlueprintType, Blueprintable)
 class CLMGAME_API UCLMEquipmentInstance : public UObject
 {
 	GENERATED_BODY()

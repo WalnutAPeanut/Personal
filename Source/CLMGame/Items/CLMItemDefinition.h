@@ -19,7 +19,7 @@ public:
 /**
  * 
  */
-UCLASS()
+UCLASS(Blueprintable)
 class CLMGAME_API UCLMItemDefinition : public UObject
 {
 	GENERATED_BODY()
