@@ -46,3 +46,11 @@ UCLMItemInstance* UCLMItemManagerComponent::AddItemDefinition(TSubclassOf<UCLMIt
 	}
 	return Result;
 }
+
+void UCLMItemManagerComponent::BeginPlay()
+{
+	Super::BeginPlay();
+	int a = 10;
+	int b = 20;
+	int c = 30;
+}

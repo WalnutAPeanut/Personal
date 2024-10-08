@@ -62,7 +62,7 @@ void UCLMQuickBarComponent::EquipItemInSlot()
 					EquippedItem = EquipmentManager->EquipItem(EquipDef);
 					if (EquippedItem)
 					{
-						EquippedItem->Instigator = SlotItem;
+						EquippedItem->SetInstigator(SlotItem);
 					}
 				}
 			}

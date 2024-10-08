@@ -18,6 +18,11 @@ class CLMGAME_API UCLMEquipmentInstance : public UObject
 public:
 	UCLMEquipmentInstance(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
+	UFUNCTION(BlueprintPure, Category = Equipment)
+	UObject* GetInstigator() const { return Instigator; }
+
+	void SetInstigator(UObject* InInstigator) { Instigator = InInstigator; }
+
 	//* Blueprint 정의를 위한 Equip/Unequip 함수
 	UFUNCTION(BlueprintImplementableEvent, Category = Equipment, meta = (DisplayName = "OnEquipped"))
 	void K2_OnEquipped();
@@ -27,9 +32,6 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = Equipment)
 	TArray<AActor*> GetSpawnedActors() const { return SpawnedActors; }
-
-	UFUNCTION(BlueprintPure, Category = Equipment)
-	UObject* GetInstigator() const { return Instigator; }
 
 	UFUNCTION(BlueprintPure, Category = Equipment)
 	APawn* GetPawn() const;
@@ -49,6 +51,7 @@ public:
 	virtual void OnEquipped();
 	virtual void OnUnequipped();
 
+private:
 	/** 어떤 InventoryItemInstance에 의해 활성화되었는지 (추후, QuickBarComponent에서 보게 될것이다) */
 	UPROPERTY()
 	TObjectPtr<UObject> Instigator;

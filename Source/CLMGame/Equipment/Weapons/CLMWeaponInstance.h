@@ -17,9 +17,15 @@ class CLMGAME_API UCLMWeaponInstance : public UCLMEquipmentInstance
 public:
 	UCLMWeaponInstance(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
+	//~UCLMEquipmentInstance interface
+	virtual void OnEquipped() override;
+	virtual void OnUnequipped() override;
+	//~End of UCLMEquipmentInstance interface
+
 	UFUNCTION(BlueprintCallable, BlueprintPure = false, Category = Animation)
 	TSubclassOf<UAnimInstance> PickBestAnimLayer(bool bEquipped, const FGameplayTagContainer& CosmeticTags) const;
 
+protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation)
 	FCLMAnimLayerSelectionSet EquippedAnimSet;
 

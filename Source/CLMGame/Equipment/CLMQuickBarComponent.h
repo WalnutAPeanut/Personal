@@ -23,16 +23,18 @@ public:
 
 	virtual void BeginPlay() override;
 
-	UCLMEquipmentManagerComponent* FindEquipmentManager() const;
-	void UnequipItemInSlot();
-	void EquipItemInSlot();
-
 	UFUNCTION(BlueprintCallable)
 	void AddItemToSlot(int32 SlotIndex, UCLMItemInstance* Item);
 
 	UFUNCTION(BlueprintCallable, Category = "CLM")
 	void SetActiveSlotIndex(int32 NewIndex);
 
+protected:
+	UCLMEquipmentManagerComponent* FindEquipmentManager() const;
+	void UnequipItemInSlot();
+	void EquipItemInSlot();
+
+private:
 	UPROPERTY()
 	int32 NumSlots = 3;
 

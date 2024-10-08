@@ -50,4 +50,6 @@ public:
 
 	UPROPERTY()
 	FCLMItemList ItemList;
+	 
+	virtual void BeginPlay() override;
 };

@@ -68,6 +68,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	TArray<UCLMEquipmentInstance*> GetEquipmentInstancesOfType(TSubclassOf<UCLMEquipmentInstance> InstanceType) const;
 
+private:
 	UPROPERTY()
 	FCLMEquipmentList EquipmentList;
 };

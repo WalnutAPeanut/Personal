@@ -8,6 +8,22 @@ UCLMWeaponInstance::UCLMWeaponInstance(const FObjectInitializer& ObjectInitializ
 {
 }
 
+void UCLMWeaponInstance::OnEquipped()
+{
+	Super::OnEquipped();
+	UWorld* World = GetWorld();
+	check(World);
+	/*TimeLastEquipped = World->GetTimeSeconds();
+	ApplyDeviceProperties();*/
+}
+
+void UCLMWeaponInstance::OnUnequipped()
+{
+	Super::OnUnequipped();
+
+	//RemoveDeviceProperties();
+}
+
 TSubclassOf<UAnimInstance> UCLMWeaponInstance::PickBestAnimLayer(bool bEquipped, const FGameplayTagContainer& CosmeticTags) const
 {
 	const FCLMAnimLayerSelectionSet& SetToQuery = (bEquipped ? EquippedAnimSet : UnequippedAnimSet);
