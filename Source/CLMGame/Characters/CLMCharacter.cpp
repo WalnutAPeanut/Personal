@@ -4,6 +4,7 @@
 #include "CLMCharacter.h"
 #include "CLMPawnExtensionComponent.h"
 #include "CLMGame/Camera/CLMCameraComponent.h"
+#include "AbilitySystem/CLMAbilitySystemComponent.h"
 
 // Sets default values
 ACLMCharacter::ACLMCharacter()
@@ -17,6 +18,11 @@ ACLMCharacter::ACLMCharacter()
 
 	CameraComponent = CreateDefaultSubobject<UCLMCameraComponent>(TEXT("CameraComponent"));
 	CameraComponent->SetRelativeLocation(FVector(-300.0f, 0.0f, 75.0f));
+}
+
+UAbilitySystemComponent* ACLMCharacter::GetAbilitySystemComponent() const
+{
+	return PawnExtComponent->GetCLMAbilitySystemComponent();
 }
 
 // Called when the game starts or when spawned

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "ModularCharacter.h"
+#include "AbilitySystemInterface.h"
 #include "CLMCharacter.generated.h"
 
 
@@ -10,13 +11,17 @@ class UCLMPawnExtensionComponent;
 class UCLMCameraComponent;
 
 UCLASS()
-class CLMGAME_API ACLMCharacter : public AModularCharacter
+class CLMGAME_API ACLMCharacter : public AModularCharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
 	ACLMCharacter();
+
+	//~IAbilitySystemInterface interface
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	//~End of IAbilitySystemInterface interface
 
 protected:
 	// Called when the game starts or when spawned

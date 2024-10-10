@@ -7,7 +7,7 @@
 #include "CLMEquipmentDefinition.generated.h"
 
 class UCLMEquipmentInstance;
-//class UCLMAbilitySet;
+class UCLMAbilitySet;
 
 USTRUCT()
 struct FCLMEquipmentActorToSpawn
@@ -46,6 +46,6 @@ public:
 	TArray<FCLMEquipmentActorToSpawn> ActorsToSpawn;
 
 	//// * 장착을 통해 부여 가능한 Ability Set
-	//UPROPERTY(EditDefaultsOnly, Category = Equipment)
-	//TArray<TObjectPtr<UCLMAbilitySet>> AbilitySetsToGrant;
+	UPROPERTY(EditDefaultsOnly, Category = Equipment)
+	TArray<TObjectPtr<UCLMAbilitySet>> AbilitySetsToGrant;
 };

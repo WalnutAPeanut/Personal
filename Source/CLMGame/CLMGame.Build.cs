@@ -25,6 +25,8 @@ public class CLMGame : ModuleRules
             "Engine",
 			// GAS
 			"GameplayTags",
+            "GameplayTasks",
+            "GameplayAbilities",
             // Game Features
             "ModularGameplay",
             "GameFeatures",

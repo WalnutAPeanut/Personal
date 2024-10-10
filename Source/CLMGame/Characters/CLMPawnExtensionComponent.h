@@ -9,6 +9,7 @@
 
 class UCLMPawnData;
 class UObject;
+class UCLMAbilitySystemComponent;
 
 /**
  * 
@@ -37,12 +38,19 @@ public:
 
 	void SetPawnData(const UCLMPawnData* InPawnData);
 
-	void SetupPlayerInputComponent();
+	/** Gets the current ability system component, which may be owned by a different actor */
+	UFUNCTION(BlueprintPure, Category = "CLM|Pawn")
+	UCLMAbilitySystemComponent* GetCLMAbilitySystemComponent() const { return AbilitySystemComponent; }
 
+	void SetupPlayerInputComponent();
+protected:
 	virtual void OnRegister() final;
 	virtual void BeginPlay() final;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) final;
 
 	UPROPERTY(EditInstanceOnly, Category = "CLM|Pawn")
 	TObjectPtr<const UCLMPawnData> PawnData;
+	
+	UPROPERTY(Transient)
+	TObjectPtr<UCLMAbilitySystemComponent> AbilitySystemComponent;
 };

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/PawnComponent.h"
+#include "CLMGame/AbilitySystem/CLMAbilitySet.h"
 #include "CLMEquipmentManagerComponent.generated.h"
 
 class UCLMEquipmentDefinition;
@@ -22,6 +23,8 @@ struct FCLMAppliedEquipmentEntry
 	UPROPERTY()
 	TObjectPtr<UCLMEquipmentInstance> Instance = nullptr;
 
+	UPROPERTY()
+	FCLMAbilitySet_GrantedHandles GrantedHandles;
 };
 
 USTRUCT(BlueprintType)
@@ -34,6 +37,8 @@ struct FCLMEquipmentList
 
 	UCLMEquipmentInstance* AddEntry(TSubclassOf<UCLMEquipmentDefinition> EquipmentDefinition);
 	void RemoveEntry(UCLMEquipmentInstance* Instance);
+
+	UCLMAbilitySystemComponent* GetAbilitySystemComponent() const;
 
 	// 장착물에 대한 관리 리스트
 	UPROPERTY()

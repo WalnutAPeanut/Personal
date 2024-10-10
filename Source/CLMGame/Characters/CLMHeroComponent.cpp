@@ -224,6 +224,10 @@ void UCLMHeroComponent::InitializePlayerInput(UInputComponent* PlayerInputCompon
 					}
 				}
 				UCLMInputComponent* CLMIC = CastChecked<UCLMInputComponent>(PlayerInputComponent);
+				
+				TArray<uint32> BindHandles;
+				CLMIC->BindAbilityActions(InputConfig, this, &ThisClass::Input_AbilityInputTagPressed, &ThisClass::Input_AbilityInputTagReleased, BindHandles);
+
 				CLMIC->BindNativeAction(InputConfig, GameplayTags.InputTag_Move, ETriggerEvent::Triggered, this, &ThisClass::Input_Move, false);
 				CLMIC->BindNativeAction(InputConfig, GameplayTags.InputTag_Look_Mouse, ETriggerEvent::Triggered, this, &ThisClass::Input_LookMouse, false);
 			}
@@ -285,6 +289,10 @@ void UCLMHeroComponent::Input_LookMouse(const FInputActionValue& InputActionValu
 		double AimInversionValue = -Value.Y;
 		Pawn->AddControllerPitchInput(AimInversionValue);
 	}
+}
+
+void UCLMHeroComponent::Input_AbilityInputTagPressed(FGameplayTag InputTag)
+{
 }
 
 TSubclassOf<UCLMCameraMode> UCLMHeroComponent::DetermineCameraMode() const
