@@ -2,6 +2,8 @@
 
 
 #include "CLMPlayerController.h"
+#include "CLMGame/Player/CLMPlayerState.h"
+#include "CLMGame/AbilitySystem/CLMAbilitySystemComponent.h"
 #include "CLMGame/Camera/CLMPlayerCameraManager.h"
 
 ACLMPlayerController::ACLMPlayerController(const FObjectInitializer& ObjectInitializer)
@@ -9,8 +11,29 @@ ACLMPlayerController::ACLMPlayerController(const FObjectInitializer& ObjectIniti
 	PlayerCameraManagerClass = ACLMPlayerCameraManager::StaticClass();
 }
 
+ACLMPlayerState* ACLMPlayerController::GetCLMPlayerState() const
+{
+	return CastChecked<ACLMPlayerState>(PlayerState, ECastCheckedType::NullAllowed);
+}
+
+UCLMAbilitySystemComponent* ACLMPlayerController::GetCLMAbilitySystemComponent() const
+{
+	const ACLMPlayerState* CLMPS = GetCLMPlayerState();
+	return (CLMPS ? CLMPS->GetCLMAbilitySystemComponent() : nullptr);
+}
+
 void ACLMPlayerController::OnPossess(APawn* aPawn)
 {
 	Super::OnPossess(aPawn);
 	int a = 10;
+}
+
+void ACLMPlayerController::PostProcessInput(const float DeltaTime, const bool bGamePaused)
+{
+	if (UCLMAbilitySystemComponent* CLMASC = GetCLMAbilitySystemComponent())
+	{
+		CLMASC->ProcessAbilityInput(DeltaTime, bGamePaused);
+	}
+
+	Super::PostProcessInput(DeltaTime, bGamePaused);
 }

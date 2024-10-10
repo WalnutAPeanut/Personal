@@ -2,12 +2,28 @@
 
 
 #include "CLMPlayerState.h"
+#include "CLMPlayerController.h"
 #include "CLMGame/GameModes/CLMExperienceManagerComponent.h"
 #include "CLMGame/GameModes/CLMGameModeBase.h"
+#include "CLMGame/AbilitySystem/CLMAbilitySystemComponent.h"
 
 ACLMPlayerState::ACLMPlayerState(const FObjectInitializer& ObjectInitializer)
 	:Super(ObjectInitializer)
 {
+	AbilitySystemComponent = ObjectInitializer.CreateDefaultSubobject<UCLMAbilitySystemComponent>(this, TEXT("AbilitySystemComponent"));
+	//AbilitySystemComponent->SetIsReplicated(true);
+	//AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
+
+}
+
+ACLMPlayerController* ACLMPlayerState::GetCLMPlayerController() const
+{
+	return Cast<ACLMPlayerController>(GetOwner());
+}
+
+UAbilitySystemComponent* ACLMPlayerState::GetAbilitySystemComponent() const
+{
+	return GetCLMAbilitySystemComponent();
 }
 
 void ACLMPlayerState::PostInitializeComponents()

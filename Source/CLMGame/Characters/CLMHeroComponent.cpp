@@ -293,6 +293,30 @@ void UCLMHeroComponent::Input_LookMouse(const FInputActionValue& InputActionValu
 
 void UCLMHeroComponent::Input_AbilityInputTagPressed(FGameplayTag InputTag)
 {
+	if (const APawn* Pawn = GetPawn<APawn>())
+	{
+		if (const UCLMPawnExtensionComponent* PawnExtComp = UCLMPawnExtensionComponent::FindPawnExtensionComponent(Pawn))
+		{
+			if (UCLMAbilitySystemComponent* CLMASC = PawnExtComp->GetCLMAbilitySystemComponent())
+			{
+				CLMASC->AbilityInputTagPressed(InputTag);
+			}
+		}
+	}
+}
+
+void UCLMHeroComponent::Input_AbilityInputTagReleased(FGameplayTag InputTag)
+{
+	if (const APawn* Pawn = GetPawn<APawn>())
+	{
+		if (const UCLMPawnExtensionComponent* PawnExtComp = UCLMPawnExtensionComponent::FindPawnExtensionComponent(Pawn))
+		{
+			if (UCLMAbilitySystemComponent* CLMASC = PawnExtComp->GetCLMAbilitySystemComponent())
+			{
+				CLMASC->AbilityInputTagReleased(InputTag);
+			}
+		}
+	}
 }
 
 TSubclassOf<UCLMCameraMode> UCLMHeroComponent::DetermineCameraMode() const

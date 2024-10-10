@@ -6,4 +6,5 @@
 UCLMGameplayAbility::UCLMGameplayAbility(const FObjectInitializer& ObjectInitializer)
 	:Super(ObjectInitializer)
 {
+	ActivationPolicy = ECLMAbilityActivationPolicy::OnInputTriggered;
 }

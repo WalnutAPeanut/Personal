@@ -62,6 +62,8 @@ void UCLMAbilitySystemComponent::AbilityInputTagReleased(const FGameplayTag& Inp
 	}
 }
 
+//PlayerController 에서 모든 입력이 끝날경우 호출 하는 형식
+//goto: CLMPlayerController
 void UCLMAbilitySystemComponent::ProcessAbilityInput(float DeltaTime, bool bGamePaused)
 {
 	TArray<FGameplayAbilitySpecHandle> AbilitiesToActivate;

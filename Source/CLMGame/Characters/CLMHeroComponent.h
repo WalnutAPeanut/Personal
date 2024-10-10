@@ -5,7 +5,9 @@
 #include "CoreMinimal.h"
 #include "Components/PawnComponent.h"
 #include "Components/GameFrameworkInitStateInterface.h"
-#include "../Input/CLMMappableConfigPair.h"
+#include "CLMGame/Input/CLMMappableConfigPair.h"
+#include "CLMGame/AbilitySystem/CLMAbilitySystemComponent.h"
+#include "GameplayAbilitySpecHandle.h"
 #include "CLMHeroComponent.generated.h"
 
 class UCLMCameraMode;
@@ -49,7 +51,9 @@ public:
 	virtual void HandleChangeInitState(UGameFrameworkComponentManager* Manager, FGameplayTag CurrentState, FGameplayTag DesiredState) final;
 	//~ End IGameFrameworkInitStateInterface interface
 
+	
 
+protected:
 	virtual void OnRegister() final;
 	virtual void BeginPlay() final;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) final;
@@ -63,6 +67,14 @@ public:
 
 	TSubclassOf<UCLMCameraMode> DetermineCameraMode() const;
 
+protected:
 	UPROPERTY(EditAnywhere)
 	TArray<FCLMMappableConfigPair> DefaultInputConfigs;
+
+	UPROPERTY()
+	TSubclassOf<UCLMCameraMode> AbilityCameraMode;
+
+	FGameplayAbilitySpecHandle AbilityCameraModeOwningSpecHandle;
+
+	bool bReadyToBindInputs;
 };

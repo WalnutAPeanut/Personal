@@ -5,6 +5,8 @@
 #include "ModularPlayerController.h"
 #include "CLMPlayerController.generated.h"
 
+class UCLMAbilitySystemComponent;
+class ACLMPlayerState;
 /**
  * 
  */
@@ -16,6 +18,18 @@ class CLMGAME_API ACLMPlayerController : public AModularPlayerController
 public:
 	ACLMPlayerController(const FObjectInitializer& ObjectInitializer);
 
+	UFUNCTION(BlueprintCallable, Category = "CLM|PlayerController")
+	ACLMPlayerState* GetCLMPlayerState() const;
 
+	UFUNCTION(BlueprintCallable, Category = "CLM|PlayerController")
+	UCLMAbilitySystemComponent* GetCLMAbilitySystemComponent() const;
+
+	//~AController interface
 	virtual void OnPossess(APawn* aPawn) override;
+	//~End of AController interface
+
+	//~APlayerController interface
+	virtual void PostProcessInput(const float DeltaTime, const bool bGamePaused) override;
+	//~End of APlayerController interface
+
 };
