@@ -25,7 +25,6 @@ UCLMAbilitySystemComponent* ACLMPlayerController::GetCLMAbilitySystemComponent()
 void ACLMPlayerController::OnPossess(APawn* aPawn)
 {
 	Super::OnPossess(aPawn);
-	int a = 10;
 }
 
 void ACLMPlayerController::PostProcessInput(const float DeltaTime, const bool bGamePaused)

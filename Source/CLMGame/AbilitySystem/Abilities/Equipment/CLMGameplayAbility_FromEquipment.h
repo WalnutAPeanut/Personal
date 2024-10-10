@@ -13,5 +13,7 @@ UCLASS()
 class CLMGAME_API UCLMGameplayAbility_FromEquipment : public UCLMGameplayAbility
 {
 	GENERATED_BODY()
-	
+public:
+	UCLMGameplayAbility_FromEquipment(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+
 };
